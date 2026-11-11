@@ -1,0 +1,14 @@
+# generated / local files
+__pycache__/
+*.pyc
+.venv/
+data/
+*.db
+*.db-wal
+*.db-shm
+*.log
+node_modules/
+# sensitive configuration (only .env.example is committed)
+.env
+.env.*
+!.env.example
