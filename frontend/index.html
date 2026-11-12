@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CampusOps</title><link rel="stylesheet" href="/static/style.css"></head>
+<body>
+<header><h1>CampusOps <small>Smart Campus Facility &amp; Maintenance</small></h1>
+  <div id="who"></div></header>
+<section id="login" class="card narrow">
+  <h2>Sign in</h2>
+  <label>User <select id="u"><option>admin</option><option>fm</option><option>tech1</option><option>tech2</option><option>approver</option><option>faculty1</option><option>faculty2</option><option>student1</option></select></label>
+  <label>Password <input id="p" type="password" autocomplete="current-password"></label>
+  <button id="go">Sign in</button>
+</section>
+<main id="app" hidden>
+  <nav id="tabs"></nav>
+  <div id="toast" role="status"></div>
+  <section id="view"></section>
+</main>
+<script src="/static/app.js"></script>
+</body></html>
