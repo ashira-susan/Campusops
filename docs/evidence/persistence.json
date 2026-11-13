@@ -1,0 +1,22 @@
+{
+ "counts_before_restart": {
+  "bookings": 2,
+  "tickets": 1,
+  "audit_events": 30,
+  "integration_links": 1,
+  "sensor_alerts": 1,
+  "approvals": 1
+ },
+ "counts_after_restart": {
+  "bookings": 2,
+  "tickets": 1,
+  "audit_events": 30,
+  "integration_links": 1,
+  "sensor_alerts": 1,
+  "approvals": 1
+ },
+ "identical": true,
+ "ticket_status_after_restart": "closed",
+ "ticket_history_events_after_restart": 10,
+ "link_after_restart": "CAMP-1-1 delivered"
+}

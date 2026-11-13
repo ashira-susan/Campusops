@@ -1,0 +1,4 @@
+FAIL: test_overlap_rejected_adjacent_allowed (test_bookings.BookingTests.test_overlap_rejected_adjacent_allowed)
+AssertionError: 409 != 201
+Ran 7 tests in 2.891s
+FAILED (failures=1)

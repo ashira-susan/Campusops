@@ -1,0 +1,170 @@
+[
+ {
+  "step": "1 sensor event (temperature 36 C, LAB-102)",
+  "instance": "A",
+  "actor": "fm",
+  "request": "POST /api/sensor-events",
+  "status": 201,
+  "result": ""
+ },
+ {
+  "step": "2 duplicate sensor event (retry)",
+  "instance": "B",
+  "actor": "fm",
+  "request": "POST /api/sensor-events",
+  "status": 200,
+  "result": "duplicate=true, same ticket"
+ },
+ {
+  "step": "3 triage suggestion shown",
+  "instance": "A",
+  "actor": "fm",
+  "request": "GET /api/tickets/1",
+  "status": 200,
+  "result": "hvac/P2: sensor metric 'temperature_c' mapped to category 'hvac'; rule R3: sensor breach, service failure in a core category, or urgent wording -> P2"
+ },
+ {
+  "step": "4 assign to technician tara",
+  "instance": "B",
+  "actor": "fm",
+  "request": "POST /api/tickets/1/assign",
+  "status": 200,
+  "result": "assigned"
+ },
+ {
+  "step": "5 start inspection",
+  "instance": "A",
+  "actor": "tech1",
+  "request": "POST /api/tickets/1/transition",
+  "status": 200,
+  "result": "inspection"
+ },
+ {
+  "step": "6 DevOps link while tracker is down",
+  "instance": "B",
+  "actor": "fm",
+  "request": "POST /api/tickets/1/devops-link",
+  "status": 502,
+  "result": "502, local ticket preserved"
+ },
+ {
+  "step": "7 retry link with same key",
+  "instance": "A",
+  "actor": "fm",
+  "request": "POST /api/tickets/1/devops-link",
+  "status": 201,
+  "result": "201 simulated link created"
+ },
+ {
+  "step": "8 resolve",
+  "instance": "B",
+  "actor": "tech1",
+  "request": "POST /api/tickets/1/transition",
+  "status": 200,
+  "result": "resolved"
+ },
+ {
+  "step": "9 close before delivery verified",
+  "instance": "A",
+  "actor": "fm",
+  "request": "POST /api/tickets/1/transition",
+  "status": 409,
+  "result": "rejected: delivery_not_verified"
+ },
+ {
+  "step": "10 delivery opened -> in_progress",
+  "instance": "B",
+  "actor": "fm",
+  "request": "POST /api/integration-links/1/progress",
+  "status": 200,
+  "result": ""
+ },
+ {
+  "step": "11 delivery in_progress -> delivered",
+  "instance": "A",
+  "actor": "fm",
+  "request": "POST /api/integration-links/1/progress",
+  "status": 200,
+  "result": ""
+ },
+ {
+  "step": "12 verify delivery",
+  "instance": "B",
+  "actor": "fm",
+  "request": "POST /api/integration-links/1/verify",
+  "status": 200,
+  "result": ""
+ },
+ {
+  "step": "13 close ticket",
+  "instance": "A",
+  "actor": "fm",
+  "request": "POST /api/tickets/1/transition",
+  "status": 200,
+  "result": "closed"
+ },
+ {
+  "step": "14 student tries to close (unauthorised)",
+  "instance": "B",
+  "actor": "student1",
+  "request": "POST /api/tickets/1/transition",
+  "status": 403,
+  "result": "forbidden"
+ },
+ {
+  "step": "15 faculty requests restricted LAB-101",
+  "instance": "A",
+  "actor": "faculty1",
+  "request": "POST /api/bookings",
+  "status": 201,
+  "result": "requested"
+ },
+ {
+  "step": "16 faculty tries to approve own request",
+  "instance": "B",
+  "actor": "faculty1",
+  "request": "POST /api/approvals/1/decide",
+  "status": 403,
+  "result": "forbidden"
+ },
+ {
+  "step": "17 approver approves with reason",
+  "instance": "B",
+  "actor": "approver",
+  "request": "POST /api/approvals/1/decide",
+  "status": 200,
+  "result": ""
+ },
+ {
+  "step": "18 confirm booking",
+  "instance": "A",
+  "actor": "faculty1",
+  "request": "POST /api/bookings/1/transition",
+  "status": 200,
+  "result": "confirmed"
+ },
+ {
+  "step": "19 overlapping request by faculty2",
+  "instance": "B",
+  "actor": "faculty2",
+  "request": "POST /api/bookings",
+  "status": 409,
+  "result": "409 booking_overlap"
+ },
+ {
+  "step": "20 check in / complete",
+  "instance": "A",
+  "actor": "fm",
+  "request": "POST /api/bookings/1/transition",
+  "status": 200,
+  "result": "in_use"
+ },
+ {
+  "step": "21 complete",
+  "instance": "B",
+  "actor": "fm",
+  "request": "POST /api/bookings/1/transition",
+  "status": 200,
+  "result": "completed"
+ }
+]

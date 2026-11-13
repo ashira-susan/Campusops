@@ -1,0 +1,30 @@
+test_devops_link_close_gate_and_failure_handling ... ok
+test_rejection_cancels_and_frees_slot ... ok
+test_restricted_booking_approve_and_authorisation ... ok
+test_booking_lifecycle_and_invalid_transition ... ok
+test_cancelled_slot_is_reusable ... ok
+test_invalid_interval ... ok
+test_overlap_rejected_adjacent_allowed ... ok
+test_restricted_booking_needs_approval ... ok
+test_unauthenticated_rejected ... ok
+test_unrestricted_booking_auto_approved ... ok
+test_audit_written_atomically_with_state_change ... ok
+test_concurrent_duplicate_requests_create_one_booking ... ok
+test_conflicting_ticket_updates_one_wins_one_stale ... ok
+test_database_trigger_blocks_overlap_even_if_application_check_is_bypassed ... ok
+test_double_approval_decision_one_winner ... ok
+test_idempotent_replay_and_key_reuse ... ok
+test_integration_failure_keeps_audit_and_writes_no_link ... ok
+test_migration_is_idempotent_and_removes_legacy_duplicate_links ... ok
+test_missing_version_rejected ... ok
+test_overlap_exactly_one_winner_across_instances ... ok
+test_audit_is_append_only ... ok
+test_full_lifecycle_and_authorisation ... ok
+test_sensor_dedup_and_threshold ... ok
+test_sensor_intake_requires_role ... ok
+test_deterministic ... ok
+test_failure_core_category_is_p2 ... ok
+test_minor_is_p4_with_explanation ... ok
+test_safety_is_p1 ... ok
+Ran 28 tests in 12.147s
+OK

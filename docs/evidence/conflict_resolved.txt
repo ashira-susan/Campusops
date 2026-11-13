@@ -1,0 +1,9 @@
+--- resolved ---
+def _hours(name, default):
+    return int(os.environ.get(name, default))
+
+# P1 resolution default is 2 h (from feature/sla-strict-p1); every value can be overridden by environment variable.
+SLA_HOURS = {p: (_hours(f"SLA_{p}_RESPONSE_H", r), _hours(f"SLA_{p}_RESOLUTION_H", s))
+             for p, (r, s) in {"P1": (1, 2), "P2": (2, 8), "P3": (4, 24), "P4": (8, 72)}.items()}
+
+ROLES = ("admin", "facility_manager", "technician", "approver", "faculty", "student")

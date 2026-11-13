@@ -1,0 +1,59 @@
+{
+ "release": "v1.1.0 (backend identical in v1.1.1)",
+ "environment": "2 backend processes, 1 shared SQLite file, sandbox with 1 CPU core, simulated work 10 ms",
+ "e1_overlapping_reservations": {
+  "rounds": 60,
+  "rounds_with_both_accepted": 0,
+  "rounds_with_one_accepted": 60,
+  "rounds_with_none": 0,
+  "overlapping_active_pairs_in_db": 0,
+  "response_pairs": {
+   "(201, 409)": 60
+  }
+ },
+ "e2_conflicting_ticket_updates": {
+  "rounds": 40,
+  "rounds_both_updates_accepted": 0,
+  "rounds_one_accepted_one_rejected": 40,
+  "rounds_with_two_conflicting_audit_events": 0,
+  "final_status_distribution": {
+   "resolved": 18,
+   "pending_work": 22
+  }
+ },
+ "e3_duplicate_retries": {
+  "trials": 20,
+  "tickets_with_duplicate_links_sequential_retry": 0,
+  "tickets_with_duplicate_links_concurrent_retry": 0,
+  "booking_retry_returned_same_booking": 20,
+  "sensor_events_with_duplicate_or_missing_ticket": 0
+ },
+ "e4_instance_restart": {
+  "acknowledged_bookings": 592,
+  "acknowledged_but_missing": 0,
+  "bookings_without_audit_event": 0,
+  "overlapping_pairs": 0,
+  "client_connection_errors_during_outage": 52,
+  "unique_acknowledged_ids": 592
+ },
+ "e5_load_60": {
+  "concurrent_users": 60,
+  "requests": 180,
+  "wall_s": 1.87,
+  "throughput_rps": 96.3,
+  "p50_ms": 104,
+  "p95_ms": 1007,
+  "max_ms": 1492,
+  "non_2xx": {}
+ },
+ "e5_load_300": {
+  "concurrent_users": 300,
+  "requests": 900,
+  "wall_s": 7.77,
+  "throughput_rps": 115.8,
+  "p50_ms": 94,
+  "p95_ms": 3890,
+  "max_ms": 7306,
+  "non_2xx": {}
+ }
+}

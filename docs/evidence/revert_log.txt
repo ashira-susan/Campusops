@@ -1,0 +1,6 @@
+e6544eb Revert "perf: simplify overlap predicate (UNSUITABLE CHANGE - deliberately introduced to demonstrate recovery)"
+99c752f perf: simplify overlap predicate (UNSUITABLE CHANGE - deliberately introduced to demonstrate recovery)
+3f4c1a5 Merge fix/ui-contrast-and-harness into main
+Ran 28 tests in 11.852s
+
+OK

@@ -1,0 +1,9 @@
+<<<<<<< HEAD
+SLA_HOURS = {"P1": (1, 2), "P2": (2, 8), "P3": (4, 24), "P4": (8, 72)}   # P1 tightened to 2 h (safety incidents)
+=======
+def _hours(name, default):
+    return int(os.environ.get(name, default))
+
+SLA_HOURS = {p: (_hours(f"SLA_{p}_RESPONSE_H", r), _hours(f"SLA_{p}_RESOLUTION_H", s))
+             for p, (r, s) in {"P1": (1, 4), "P2": (2, 8), "P3": (4, 24), "P4": (8, 72)}.items()}   # env-overridable
+>>>>>>> feature/sla-env-config

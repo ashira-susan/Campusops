@@ -1,0 +1,15 @@
+{
+  "label": "v1.0.0",
+  "simulated_work_ms": 10,
+  "cpu_count": 1,
+  "e1_overlapping_reservations": {
+    "rounds": 60,
+    "rounds_with_both_accepted": 60,
+    "rounds_with_one_accepted": 0,
+    "rounds_with_none": 0,
+    "overlapping_active_pairs_in_db": 60,
+    "response_pairs": {
+      "(201, 201)": 60
+    }
+  }
+}

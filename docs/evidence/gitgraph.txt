@@ -1,0 +1,45 @@
+*   3f4c1a5 (HEAD -> main, tag: v1.1.1) Merge fix/ui-contrast-and-harness into main
+|\  
+| * c3f8c1e (fix/ui-contrast-and-harness) test(scripts): harness sends expected_version in ticket setup; add end-to-end demo journey and screenshot script
+| * 788e00b fix(ui): readable inactive tab labels; compose reports v1.1.1
+|/  
+*   93218fc (tag: v1.1.0) Merge feature/concurrency-hardening into main
+|\  
+| * f943db2 (feature/concurrency-hardening) test(scripts): two-instance experiment harness (overlap, conflicting updates, retries, restart, bounded load)
+| * bc4412f feat(deploy): two backend instances behind nginx, one-shot init service, shared data volume; README limitations
+| * 10caac5 feat(ui): send Idempotency-Key with safe retry and expected_version; show ticket version
+| * 42ac299 feat(concurrency): atomic transactions, optimistic ticket versions, idempotency keys, DB overlap guard; tests for two-instance races
+| * 0ab71e8 feat(db): migration 1 - ticket version column, idempotency table, unique integration link, overlap triggers
+|/  
+*   db942a7 (tag: v1.0.0) Merge feature/sla-env-config into main (resolve conflict: keep env-configurable SLA with 2 h P1 default)
+|\  
+| * 6e9d43b (feature/sla-env-config) docs: self-review record for SLA configuration change (simulated review)
+| * 295f95b feat(sla): make SLA targets configurable through environment variables
+* |   44f91a9 Merge feature/sla-strict-p1 into main
+|\ \  
+| |/  
+|/|   
+| * 1ae30ea (feature/sla-strict-p1) fix(sla): tighten P1 resolution target from 4 h to 2 h for safety incidents
+|/  
+*   a8b074e Merge feature/containers into main
+|\  
+| * 7d3990c (feature/containers) feat(container): docker-compose with nginx, named data volume and env_file secrets; run docs
+| * c7dc93f feat(container): backend Dockerfile (non-root, healthcheck) and run entry point
+|/  
+*   28ccae7 Merge feature/frontend into main
+|\  
+| * 8aac9da (feature/frontend) feat(ui): single-page frontend (dashboard, catalogue, calendar, tickets, approvals, sensors, audit)
+|/  
+*   89ae239 Merge feature/approvals-devops into main
+|\  
+| * 59954f6 (feature/approvals-devops) test: approvals, rejection frees slot, devops link and close gate
+| * aebdea4 feat(devops): simulated issue-tracker link, delivery progress/verification, close gate
+| * 0045f9e feat(approvals): approver-only decisions with mandatory reason and separation of duties; equipment loans
+|/  
+*   2874b12 Merge feature/ticket-triage into main
+|\  
+| * b0ceefd (feature/ticket-triage) test: triage rules, ticket lifecycle, authorisation, sensor dedup, append-only audit
+| * cec3594 feat(sensors): controlled sensor intake with duplicate-event guard; dashboard counts
+| * 1f69243 feat(triage): rule-based explainable triage and ticket lifecycle with SLA indicator
+|/  
+*   ba10e34 Merge feature/booking-api into main

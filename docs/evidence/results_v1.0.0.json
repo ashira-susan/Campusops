@@ -1,0 +1,70 @@
+{
+ "release": "v1.0.0",
+ "environment": "2 backend processes, 1 shared SQLite file, sandbox with 1 CPU core, simulated work 10 ms",
+ "e1_overlapping_reservations": {
+  "rounds": 60,
+  "rounds_with_both_accepted": 60,
+  "rounds_with_one_accepted": 0,
+  "rounds_with_none": 0,
+  "overlapping_active_pairs_in_db": 60,
+  "response_pairs": {
+   "(201, 201)": 60
+  }
+ },
+ "e1_overlapping_reservations_zero_simulated_work": {
+  "rounds": 60,
+  "rounds_with_both_accepted": 59,
+  "rounds_with_one_accepted": 1,
+  "rounds_with_none": 0,
+  "overlapping_active_pairs_in_db": 59,
+  "response_pairs": {
+   "(201, 201)": 59,
+   "(201, 409)": 1
+  }
+ },
+ "e2_conflicting_ticket_updates": {
+  "rounds": 40,
+  "rounds_both_updates_accepted": 40,
+  "rounds_one_accepted_one_rejected": 0,
+  "rounds_with_two_conflicting_audit_events": 40,
+  "final_status_distribution": {
+   "resolved": 30,
+   "pending_work": 10
+  }
+ },
+ "e3_duplicate_retries": {
+  "trials": 20,
+  "tickets_with_duplicate_links_sequential_retry": 20,
+  "tickets_with_duplicate_links_concurrent_retry": 20,
+  "booking_retry_returned_same_booking": 0,
+  "sensor_events_with_duplicate_or_missing_ticket": 0
+ },
+ "e4_instance_restart": {
+  "acknowledged_bookings": 1239,
+  "acknowledged_but_missing": 0,
+  "bookings_without_audit_event": 0,
+  "overlapping_pairs": 0,
+  "client_connection_errors_during_outage": 76,
+  "unique_acknowledged_ids": 1239
+ },
+ "e5_load_60": {
+  "concurrent_users": 60,
+  "requests": 180,
+  "wall_s": 0.64,
+  "throughput_rps": 283.1,
+  "p50_ms": 64,
+  "p95_ms": 282,
+  "max_ms": 447,
+  "non_2xx": {}
+ },
+ "e5_load_300": {
+  "concurrent_users": 300,
+  "requests": 900,
+  "wall_s": 3.37,
+  "throughput_rps": 266.9,
+  "p50_ms": 195,
+  "p95_ms": 1528,
+  "max_ms": 2625,
+  "non_2xx": {}
+ }
+}
