@@ -15,7 +15,7 @@ ACTIONS = {"confirm": ("approved", "confirmed", ("facility_manager", "admin"), T
 
 def overlap(c, facility_id, start, end, exclude_id=None):
     q = (f"SELECT id FROM bookings WHERE facility_id=? AND status IN ({','.join('?'*len(ACTIVE))}) "
-         "AND start_ts <= ? AND end_ts >= ?")
+         "AND start_ts < ? AND end_ts > ?")
     args = [facility_id, *ACTIVE, end, start]
     if exclude_id:
         q += " AND id<>?"; args.append(exclude_id)
