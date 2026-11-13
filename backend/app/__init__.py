@@ -1,4 +1,4 @@
-import importlib, pkgutil, os
+import importlib, pkgutil, os, sqlite3
 from flask import Flask, g, jsonify, send_from_directory
 from . import config, db
 from .util import ApiError
@@ -24,6 +24,10 @@ def create_app(overrides=None):
     @app.errorhandler(ApiError)
     def _api_error(e):
         return jsonify(error=e.code, message=e.message, **e.extra), e.status
+
+    @app.errorhandler(sqlite3.OperationalError)
+    def _busy(e):
+        return jsonify(error="database_busy", message="Database busy; retry with the same Idempotency-Key", retry_safe=True), 503
 
     @app.errorhandler(404)
     def _nf(e):

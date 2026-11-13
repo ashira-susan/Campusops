@@ -3,12 +3,14 @@ from flask import Blueprint, g, jsonify, request
 import sqlite3
 from .. import auth, config, db
 from ..util import ApiError, require_fields
+from ..concurrency import transactional
 from .tickets import create_ticket, view
 
 bp = Blueprint("sensors", __name__)
 
 @bp.post("/api/sensor-events")
 @auth.roles_required("admin", "facility_manager")
+@transactional
 def sensor_event():
     body = request.get_json(silent=True) or {}
     require_fields(body, "sensor_id", "event_id", "facility_id", "metric", "value")

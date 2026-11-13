@@ -2,12 +2,15 @@
 from flask import Blueprint, g, jsonify, request
 from .. import auth, db, integrations
 from ..util import ApiError, require_fields
+from ..concurrency import transactional, idempotent
 
 bp = Blueprint("devops", __name__)
 ORDER = ["opened", "in_progress", "delivered"]
 
 @bp.post("/api/tickets/<int:tid>/devops-link")
 @auth.roles_required("facility_manager", "admin")
+@transactional
+@idempotent
 def create_link(tid):
     t = g.db.execute("SELECT * FROM tickets WHERE id=?", (tid,)).fetchone()
     if not t:
@@ -17,7 +20,9 @@ def create_link(tid):
         issue = integrations.create_issue(tid, n, simulate_failure=request.headers.get("X-Simulate-Integration") == "down")
     except integrations.IntegrationError as e:
         db.audit(g.db, g.user["username"], "integration_failed", "ticket", tid, error=str(e))
-        raise ApiError(502, "integration_unavailable", str(e), local_ticket_preserved=True, retry_safe=True)
+        err = ApiError(502, "integration_unavailable", str(e), local_ticket_preserved=True, retry_safe=True)
+        err.commit = True                                  # keep the failure audit event; no link row was written
+        raise err
     cur = g.db.execute("INSERT INTO integration_links(ticket_id,system,external_ref,mode,delivery_status,created_at) VALUES(?,?,?,?, 'opened',?)",
                        (tid, issue["system"], issue["external_ref"], issue["mode"], db.utcnow()))
     db.audit(g.db, g.user["username"], "integration_linked", "ticket", tid, ref=issue["external_ref"], mode=issue["mode"])
@@ -25,6 +30,7 @@ def create_link(tid):
 
 @bp.post("/api/integration-links/<int:lid>/progress")
 @auth.roles_required("facility_manager", "admin")
+@transactional
 def progress(lid):
     body = request.get_json(silent=True) or {}
     require_fields(body, "delivery_status")
@@ -40,6 +46,7 @@ def progress(lid):
 
 @bp.post("/api/integration-links/<int:lid>/verify")
 @auth.roles_required("facility_manager", "admin")
+@transactional
 def verify(lid):
     link = g.db.execute("SELECT * FROM integration_links WHERE id=?", (lid,)).fetchone()
     if not link:

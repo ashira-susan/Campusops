@@ -1,7 +1,8 @@
-"""Bookings. v1.0 assumes ONE backend process: overlap is guarded by an in-process lock."""
-import threading
+"""Bookings. v1.1: overlap is decided inside a database transaction (works across backend instances)."""
+import sqlite3
 from flask import Blueprint, g, jsonify, request
 from .. import auth, db
+from ..concurrency import transactional, idempotent
 from ..util import ApiError, parse_ts, require_fields, simulated_work
 
 bp = Blueprint("bookings", __name__)
@@ -11,7 +12,6 @@ ACTIONS = {"confirm": ("approved", "confirmed", ("facility_manager", "admin"), T
            "check_in": ("confirmed", "in_use", ("facility_manager", "technician", "admin"), False),
            "complete": ("in_use", "completed", ("facility_manager", "technician", "admin"), False),
            "cancel": (("requested", "approved", "confirmed"), "cancelled", ("facility_manager", "admin"), True)}
-_lock = threading.Lock()
 
 def overlap(c, facility_id, start, end, exclude_id=None):
     q = (f"SELECT id FROM bookings WHERE facility_id=? AND status IN ({','.join('?'*len(ACTIVE))}) "
@@ -37,6 +37,8 @@ def list_bookings():
 
 @bp.post("/api/bookings")
 @auth.login_required
+@transactional
+@idempotent
 def create_booking():
     body = request.get_json(silent=True) or {}
     require_fields(body, "facility_id", "start_ts", "end_ts", "purpose")
@@ -48,13 +50,17 @@ def create_booking():
         raise ApiError(404, "facility_not_found", "Unknown facility")
     status = "requested" if fac["restricted"] else "approved"
     now = db.utcnow()
-    with _lock:                                            # protects THIS process only
-        hit = overlap(g.db, fac["id"], start, end)
-        if hit:
-            raise ApiError(409, "booking_overlap", "Facility already booked for an overlapping slot", conflicting_booking=hit["id"])
-        simulated_work()                                   # e.g. external calendar sync
+    hit = overlap(g.db, fac["id"], start, end)             # friendly check; the DB trigger is the guarantee
+    if hit:
+        raise ApiError(409, "booking_overlap", "Facility already booked for an overlapping slot", conflicting_booking=hit["id"])
+    simulated_work()                                       # e.g. external calendar sync (held inside the write lock: see limitations)
+    try:
         cur = g.db.execute("INSERT INTO bookings(facility_id,requested_by,start_ts,end_ts,purpose,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)",
                            (fac["id"], g.user["id"], start, end, body["purpose"], status, now, now))
+    except sqlite3.DatabaseError as e:
+        if "booking_overlap" in str(e):
+            raise ApiError(409, "booking_overlap", "Facility already booked for an overlapping slot")
+        raise
     bid = cur.lastrowid
     if fac["restricted"]:
         g.db.execute("INSERT INTO approvals(subject_type,subject_id,requested_by,created_at) VALUES('booking',?,?,?)", (bid, g.user["id"], now))
@@ -63,6 +69,7 @@ def create_booking():
 
 @bp.post("/api/bookings/<int:bid>/transition")
 @auth.login_required
+@transactional
 def transition(bid):
     body = request.get_json(silent=True) or {}
     require_fields(body, "action")

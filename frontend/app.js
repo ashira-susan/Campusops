@@ -5,8 +5,13 @@ const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": 
 const pill = v => `<span class="pill ${esc(v)}">${esc(v)}</span>`;
 
 async function api(path, opts = {}) {
+  const method = opts.method || "GET";
   const headers = { "Content-Type": "application/json", ...(S.token ? { Authorization: "Bearer " + S.token } : {}), ...(opts.headers || {}) };
-  const res = await fetch("/api" + path, { method: opts.method || "GET", headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+  if (method === "POST" && !headers["Idempotency-Key"]) headers["Idempotency-Key"] = crypto.randomUUID();   // one key per user action
+  const send = () => fetch("/api" + path, { method, headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+  let res;
+  try { res = await send(); if (res.status === 503 && method === "POST") { await new Promise(r => setTimeout(r, 300)); res = await send(); } }
+  catch (e) { if (method !== "POST") throw e; await new Promise(r => setTimeout(r, 300)); res = await send(); }   // safe retry: same Idempotency-Key
   const data = await res.json().catch(() => ({}));
   if (!res.ok) { const e = new Error(data.message || res.statusText); e.status = res.status; e.data = data; throw e; }
   return data;
@@ -63,8 +68,8 @@ async function tickets() {
   const techs = S.users.filter(u => u.role === "technician");
   let detail = "";
   if (S.ticket) {
-    const d = await api("/tickets/" + S.ticket), t = d.ticket;
-    detail = `<div class="card"><h3>#${t.id} ${esc(t.title)} ${pill(t.status)}</h3><p>${esc(t.description)}</p>
+    const d = await api("/tickets/" + S.ticket), t = d.ticket; S.tv = t.version;
+    detail = `<div class="card"><h3>#${t.id} ${esc(t.title)} ${pill(t.status)} <span class="note">version ${t.version}</span></h3><p>${esc(t.description)}</p>
     <p><b>Suggested</b> ${esc(t.suggested_category)}/${esc(t.suggested_priority)} – <i>${esc(t.triage_explanation)}</i><br><b>Final</b> ${esc(t.category)}/${esc(t.priority)} · SLA ${pill(t.sla.state)} (${t.sla.minutes_remaining ?? "–"} min) · due ${esc(t.sla_due_at)}</p>
     <p>Assignee: ${esc(t.assignee || "–")} · Inspection: ${esc(t.inspection_notes || "–")} · Resolution: ${esc(t.resolution_notes || "–")}</p>
     <div class="row"><div><label>Assign to<select id="at">${techs.map(u => `<option value="${u.id}">${esc(u.display_name)}</option>`).join("")}</select></label>
@@ -108,8 +113,8 @@ function bind() {
   on(".tv", el => { S.ticket = el.dataset.t; render(); });
   if ($("#ngo")) $("#ngo").onclick = () => act(() => api("/tickets", { method: "POST", body: { title: val("nt"), description: val("nd"), facility_id: +val("nf") } }), "Ticket created");
   if ($("#npv")) $("#npv").onclick = async () => { const r = await api("/triage-preview?text=" + encodeURIComponent(val("nt") + ". " + val("nd"))); $("#npvout").textContent = `${r.category} / ${r.priority} – ${r.explanation} [${r.method}]`; };
-  if ($("#ago")) $("#ago").onclick = el => act(() => api(`/tickets/${S.ticket}/assign`, { method: "POST", body: { technician_id: +val("at"), priority: val("ap") || undefined } }), "Ticket assigned");
-  on(".tt", el => act(() => api(`/tickets/${el.dataset.t}/transition`, { method: "POST", body: { action: el.dataset.a, notes: val("tn") } }), "Ticket updated"));
+  if ($("#ago")) $("#ago").onclick = el => act(() => api(`/tickets/${S.ticket}/assign`, { method: "POST", body: { technician_id: +val("at"), priority: val("ap") || undefined, expected_version: S.tv } }), "Ticket assigned");
+  on(".tt", el => act(() => api(`/tickets/${el.dataset.t}/transition`, { method: "POST", body: { action: el.dataset.a, notes: val("tn"), expected_version: S.tv } }), "Ticket updated"));
   on(".dl", el => act(() => api(`/tickets/${el.dataset.t}/devops-link`, { method: "POST", headers: el.dataset.fail ? { "X-Simulate-Integration": "down" } : {} }), "Link created"));
   on(".lp", el => { const order = ["opened", "in_progress", "delivered"]; api("/tickets/" + S.ticket).then(d => { const l = d.links.find(x => x.id == el.dataset.l); act(() => api(`/integration-links/${l.id}/progress`, { method: "POST", body: { delivery_status: order[order.indexOf(l.delivery_status) + 1] } }), "Delivery advanced"); }); });
   on(".lv", el => act(() => api(`/integration-links/${el.dataset.l}/verify`, { method: "POST" }), "Delivery verified"));
