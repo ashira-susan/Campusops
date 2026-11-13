@@ -49,4 +49,5 @@ def audit_log():
     q += " ORDER BY id DESC LIMIT 200"
     return jsonify([dict(r) for r in g.db.execute(q, args)])
 
-VERSION = "dev"
+import os
+VERSION = os.environ.get("APP_VERSION", "dev")

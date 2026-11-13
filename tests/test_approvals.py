@@ -22,14 +22,15 @@ class ApprovalTests(unittest.TestCase):
         self.assertEqual(r.status_code, 201)
     def test_devops_link_close_gate_and_failure_handling(self):
         tid = self.c.post("/api/tickets", json=dict(title="Projector not working", description="no image", facility_id=4), headers=self.s).get_json()["id"]
-        self.c.post(f"/api/tickets/{tid}/assign", json={"technician_id": 3}, headers=self.fm)
+        ver = lambda: self.c.get(f"/api/tickets/{tid}", headers=self.fm).get_json()["ticket"]["version"]
+        self.c.post(f"/api/tickets/{tid}/assign", json={"technician_id": 3, "expected_version": ver()}, headers=self.fm)
         for a in ("start_inspection", "resolve"):
-            self.c.post(f"/api/tickets/{tid}/transition", json=dict(action=a, notes="n"), headers=self.t1)
+            self.c.post(f"/api/tickets/{tid}/transition", json=dict(action=a, notes="n", expected_version=ver()), headers=self.t1)
         bad = self.c.post(f"/api/tickets/{tid}/devops-link", headers={**self.fm, "X-Simulate-Integration": "down"})
         self.assertEqual((bad.status_code, bad.get_json()["local_ticket_preserved"]), (502, True))
         link = self.c.post(f"/api/tickets/{tid}/devops-link", headers=self.fm).get_json()
         self.assertEqual(link["mode"], "simulated")
-        close = lambda: self.c.post(f"/api/tickets/{tid}/transition", json={"action": "close"}, headers=self.fm)
+        close = lambda: self.c.post(f"/api/tickets/{tid}/transition", json={"action": "close", "expected_version": ver()}, headers=self.fm)
         self.assertEqual(close().status_code, 409)
         self.c.post(f"/api/integration-links/{link['id']}/progress", json={"delivery_status": "delivered"}, headers=self.fm)  # skip -> 409
         for st in ("in_progress", "delivered"):

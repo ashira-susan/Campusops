@@ -2,6 +2,7 @@
 from flask import Blueprint, g, jsonify, request
 from .. import auth, db
 from ..util import ApiError, require_fields
+from ..concurrency import transactional, idempotent
 
 bp = Blueprint("approvals", __name__)
 
@@ -16,6 +17,7 @@ def list_approvals():
 
 @bp.post("/api/approvals/<int:aid>/decide")
 @auth.roles_required("approver")
+@transactional
 def decide(aid):
     body = request.get_json(silent=True) or {}
     require_fields(body, "decision", "reason")
@@ -44,6 +46,8 @@ def loans():
 
 @bp.post("/api/equipment-loans")
 @auth.login_required
+@transactional
+@idempotent
 def create_loan():
     body = request.get_json(silent=True) or {}
     require_fields(body, "equipment_id", "start_date", "end_date")

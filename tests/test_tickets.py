@@ -20,12 +20,16 @@ class TicketTests(unittest.TestCase):
         self.fm, self.t1, self.t2, self.st = (login(self.c, u) for u in ("fm", "tech1", "tech2", "student1"))
     def mk(self, text="Projector not working"):
         return self.c.post("/api/tickets", json=dict(title=text, description=text, facility_id=4), headers=self.st).get_json()["id"]
+    def ver(self, tid):
+        return self.c.get(f"/api/tickets/{tid}", headers=self.fm).get_json()["ticket"]["version"]
     def act(self, h, tid, a, notes="n"):
-        return self.c.post(f"/api/tickets/{tid}/transition", json={"action": a, "notes": notes}, headers=h)
+        return self.c.post(f"/api/tickets/{tid}/transition", json={"action": a, "notes": notes, "expected_version": self.ver(tid)}, headers=h)
+    def assign(self, h, tid, tech=3):
+        return self.c.post(f"/api/tickets/{tid}/assign", json={"technician_id": tech, "expected_version": self.ver(tid)}, headers=h)
     def test_full_lifecycle_and_authorisation(self):
         tid = self.mk()
-        self.assertEqual(self.c.post(f"/api/tickets/{tid}/assign", json={"technician_id": 3}, headers=self.st).status_code, 403)
-        self.assertEqual(self.c.post(f"/api/tickets/{tid}/assign", json={"technician_id": 3}, headers=self.fm).status_code, 200)
+        self.assertEqual(self.assign(self.st, tid).status_code, 403)
+        self.assertEqual(self.assign(self.fm, tid).status_code, 200)
         self.assertEqual(self.act(self.t2, tid, "start_inspection").status_code, 403)       # not the assignee
         self.assertEqual(self.act(self.t1, tid, "resolve").status_code, 409)                # skipping inspection
         self.assertEqual(self.act(self.t1, tid, "start_inspection").get_json()["status"], "inspection")
