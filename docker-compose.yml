@@ -3,7 +3,7 @@ x-api: &api
   build: ./backend
   env_file: .env
   environment: &apienv
-    APP_VERSION: v1.1.0
+    APP_VERSION: v1.1.1
   volumes:
     - dbdata:/data
   restart: unless-stopped

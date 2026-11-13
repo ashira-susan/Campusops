@@ -2,7 +2,7 @@
 *{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:#1c2430}
 header{background:var(--navy);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:10px 18px}
 header h1{font-size:18px;margin:0}header small{font-weight:400;opacity:.75;margin-left:8px}
-nav{display:flex;gap:4px;padding:10px 18px 0;flex-wrap:wrap}nav button{border:1px solid var(--line);border-bottom:none;background:#e8edf3;padding:8px 14px;border-radius:6px 6px 0 0;cursor:pointer}
+nav{display:flex;gap:4px;padding:10px 18px 0;flex-wrap:wrap}nav button{color:var(--navy);border:1px solid var(--line);border-bottom:none;background:#e8edf3;padding:8px 14px;border-radius:6px 6px 0 0;cursor:pointer}
 nav button.on{background:#fff;font-weight:600;color:var(--navy)}
 #view{background:#fff;margin:0 18px 18px;padding:16px;border:1px solid var(--line);min-height:360px}
 .card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:12px}.narrow{max-width:340px;margin:40px auto}

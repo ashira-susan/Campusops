@@ -62,10 +62,16 @@ def e1_overlap(cl, tk, rounds=60):
     return {"rounds": rounds, "rounds_with_both_accepted": wins[2], "rounds_with_one_accepted": wins[1], "rounds_with_none": wins[0],
             "overlapping_active_pairs_in_db": pairs, "response_pairs": {str(k): codes.count(list(k)) for k in {tuple(c) for c in codes}}}
 
+def tver(cl, tk, t):
+    return requests.get(cl.url("A") + f"/api/tickets/{t}", headers=tk["fm"]).json()["ticket"].get("version")   # None on v1.0.x
+
+def with_v(body, v):
+    return dict(body, expected_version=v) if v is not None else body
+
 def make_ticket_in_inspection(cl, tk):
     t = requests.post(cl.url("A") + "/api/tickets", json=dict(title="Projector not working", description="no image", facility_id=4), headers=tk["student1"]).json()["id"]
-    requests.post(cl.url("A") + f"/api/tickets/{t}/assign", json={"technician_id": 3}, headers=tk["fm"])
-    requests.post(cl.url("A") + f"/api/tickets/{t}/transition", json=dict(action="start_inspection", notes="looking"), headers=tk["tech1"])
+    requests.post(cl.url("A") + f"/api/tickets/{t}/assign", json=with_v({"technician_id": 3}, tver(cl, tk, t)), headers=tk["fm"])
+    requests.post(cl.url("A") + f"/api/tickets/{t}/transition", json=with_v(dict(action="start_inspection", notes="looking"), tver(cl, tk, t)), headers=tk["tech1"])
     return t
 
 def e2_ticket(cl, tk, rounds=40):
