@@ -17,6 +17,6 @@ const { chromium } = require('playwright');
   await p.screenshot({ path: out + '/02_booking_overlap_rejected.png' });
   p = await session('approver'); await tab(p, 'Approvals & Loans'); await p.screenshot({ path: out + '/04_approvals.png' });
   p = await session('student1'); await tab(p, 'Tickets'); await p.click(`.tv[data-t="${process.env.TID}"]`); await p.waitForTimeout(500);
-  await p.click('.tt[data-a="close"]'); await p.waitForTimeout(500); await p.screenshot({ path: out + '/06_unauthorised_close.png', clip: { x: 0, y: 0, width: 1180, height: 200 } });
+  await p.click('.tt[data-a="close"]'); await p.waitForTimeout(500); await p.evaluate(() => window.scrollTo(0, 0)); await p.screenshot({ path: out + '/06_unauthorised_close.png', clip: { x: 0, y: 0, width: 1180, height: 200 } });
   await b.close(); console.log('ok');
 })().catch(e => { console.error(String(e)); process.exit(1); });
