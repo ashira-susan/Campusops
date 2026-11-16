@@ -24,3 +24,8 @@ Without Docker: `pip install -r backend/requirements.txt`, export the variables 
 - Werkzeug's threaded server is used instead of gunicorn (that is what was load-tested).
 - Triage is keyword rules, not machine learning; the issue-tracker link is simulated (mode shown in the UI).
 - Single ticket assignee; no password reset, TLS termination or rate limiting.
+
+## Documentation
+
+- [Deployment checklist](docs/DEPLOYMENT-CHECKLIST.md) – Docker deployment and verification steps.
+- [SLA configuration review](docs/REVIEW-sla-env-config.md) – Review notes for the environment-configurable SLA implementation.
